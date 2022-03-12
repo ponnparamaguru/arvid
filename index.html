@@ -1,39 +1,68 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <title>Video</title>
-        <meta name="apple-mobile-web-app-capable" content="yes"/>
-        <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
-        <script src="https://jeromeetienne.github.io/AR.js/aframe/build/aframe-ar.js"></script>
+<html lang="en">
+  <head>
+    <title>Hello!</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script
+      type="text/javascript"
+      src="https://aframe.io/releases/1.3.0/aframe.min.js"
+    ></script>
+  <script src="https://cdn.rawgit.com/jeromeetienne/AR.js/1.7.1/aframe/build/aframe-ar.js"></script>
+    <script
+      type="text/javascript"
+      src="https://rawgit.com/donmccurdy/aframe-extras/master/dist/aframe-extras.loaders.min.js"
+    ></script> -->
 
-        <script>
-            AFRAME.registerComponent('hide-in-ar-mode', {
-                init: function () {
-                    this.el.sceneEl.addEventListener('enter-vr', (ev) => {
-                        this.wasVisible = this.el.getAttribute('visible');
-                            if (this.el.sceneEl.is('ar-mode')) {
-                        this.el.setAttribute('visible', false);
-                        }
-                    });
-                    this.el.sceneEl.addEventListener('exit-vr', (ev) => {
-                        if (this.wasVisible) this.el.setAttribute('visible', true);
-                    });
-                }
-            });
+    <!-- import the webpage's stylesheet -->
+    
 
-        </script>
-    </head>
-    <body style='margin : 0px; overflow: hidden;'>
-        <a-scene embedded arjs>
-            <a-sky color="lightblue" hide-in-ar-mode></a-sky>
-            <a-assets>
-               <video id="vid" src="/final.webm" autoplay loop ="true" playsinline></video>
-                <a-asset-item id="location" src="src/map pointer.obj"></a-asset-item>
-            </a-assets>
-            <a-marker>
-                <a-video src="#vid" height="0.5" width="1" position="0 1 0"></a-video>
-                <a-obj-model src="#location" position="2 0 -3" scale="0.2 0.2 0.2"></a-obj-model>
-            </a-marker>
-        </a-scene>
-    </body>
+    <!-- import the webpage's javascript file -->
+    <script>
+AFRAME.registerComponent("vidhandler", {
+    // ...
+    init: function () {
+      // Set up initial state and variables.
+      this.toggle = false;
+      this.vid = document.querySelector("#vid");
+      this.vid.pause();
+    },
+    tick: function () {
+      if (this.el.object3D.visible == true) {
+        if (!this.toggle) {
+          this.toggle = true;
+          this.vid.play();
+        }
+      } else {
+        this.toggle = false;
+        this.vid.pause();
+      }
+    }
+  });</script>
+
+
+    <a-scene>
+
+   <a-assets>
+        <video  id="vid" response-type="arraybuffer" loop="false" crossorigin webkit-playsinline playsinline controls>
+            <source src="final.webm" type="video/webm">
+        </video>
+        <a-asset-item id="location" src="src/map pointer.obj"></a-asset-item>
+    </a-assets>
+
+   <a-marker type="pattern" preset="hiro" vidhandler>
+        <a-entity position="0 0 0">
+            <a-video width="4" height="3" rotation="-90 0 0" material='transparent:true;shader:flat;side:double;src:#vid'></a-video>
+        </a-entity>
+        <a-obj-model src="#location" position="2 0 -3" scale="0.2 0.2 0.2"></a-obj-model>
+      </a-marker>
+
+    <a-entity camera>
+        <a-entity cursor="rayOrigin: mouse;fuse: false;"></a-entity>
+    </a-entity>
+
+</a-scene>
+
+  </body>
 </html>
